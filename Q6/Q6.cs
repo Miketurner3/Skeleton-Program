@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -49,6 +50,16 @@ namespace TargetClearCS
             while (!GameOver)
             {
                 DisplayState(Targets, NumbersAllowed, Score);
+
+                Console.WriteLine("enter MOVE to shift targets to right (score minus 2): ");
+                if (Console.ReadLine() == "MOVE")
+                {
+                    Targets.RemoveAt(Targets.Count - 1);
+                    Targets.Insert(0, -1);
+                    Score = Score - 2;
+                    continue;
+                }
+
                 Console.Write("Enter an expression: ");
                 UserInput = Console.ReadLine();
                 Console.WriteLine();
@@ -78,7 +89,7 @@ namespace TargetClearCS
             DisplayScore(Score);
         }
 
-        static bool CheckIfUserInputEvaluationIsATarget(List<int> Targets, List<string> UserInputInRPN, ref int Score)
+            static bool CheckIfUserInputEvaluationIsATarget(List<int> Targets, List<string> UserInputInRPN, ref int Score)
         {
             int UserInputEvaluation = EvaluateRPN(UserInputInRPN);
             bool UserInputEvaluationIsATarget = false;
@@ -114,7 +125,11 @@ namespace TargetClearCS
 
         static void UpdateTargets(List<int> Targets, bool TrainingGame, int MaxTarget)
         {
-            Targets.RemoveAt(0);
+            for (int Count = 0; Count < Targets.Count - 1; Count++)
+            {
+                Targets[Count] = Targets[Count + 1];
+            }
+            Targets.RemoveAt(Targets.Count - 1);
             if (TrainingGame)
             {
                 Targets.Add(Targets[Targets.Count - 1]);

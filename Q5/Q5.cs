@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace TargetClearCS
 {
@@ -80,6 +81,7 @@ namespace TargetClearCS
 
         static bool CheckIfUserInputEvaluationIsATarget(List<int> Targets, List<string> UserInputInRPN, ref int Score)
         {
+            int AmoutOfOps = AmountOfOperands(UserInputInRPN);
             int UserInputEvaluation = EvaluateRPN(UserInputInRPN);
             bool UserInputEvaluationIsATarget = false;
             if (UserInputEvaluation != -1)
@@ -88,13 +90,26 @@ namespace TargetClearCS
                 {
                     if (Targets[Count] == UserInputEvaluation)
                     {
-                        Score += 2;
+                        Score += 2 + (2 * AmoutOfOps);
                         Targets[Count] = -1;
                         UserInputEvaluationIsATarget = true;
                     }
                 }
             }
             return UserInputEvaluationIsATarget;
+        }
+
+        private static int AmountOfOperands(List<string> userInputInRPN)
+        {
+            int Count = 0;
+            foreach (string item in userInputInRPN)
+            {
+                if (!(item == "+" || item == "-" || item == "*" || item == "/" ))
+                {
+                    Count++;
+                }
+            }
+            return Count;
         }
 
         static void RemoveNumbersUsed(string UserInput, int MaxNumber, List<int> NumbersAllowed)
@@ -114,7 +129,11 @@ namespace TargetClearCS
 
         static void UpdateTargets(List<int> Targets, bool TrainingGame, int MaxTarget)
         {
-            Targets.RemoveAt(0);
+            for (int Count = 0; Count < Targets.Count - 1; Count++)
+            {
+                Targets[Count] = Targets[Count + 1];
+            }
+            Targets.RemoveAt(Targets.Count - 1);
             if (TrainingGame)
             {
                 Targets.Add(Targets[Targets.Count - 1]);
